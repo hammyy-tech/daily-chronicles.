@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Daliy Chronicles</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold: #d4af37;
+      --dark-bg: #0f0f0f;
+      --card-bg: #1e1e1e;
+      --text-light: #f5f5f5;
+      --accent: #b49c68;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to right, #141414, #1c1c1c);
+      color: var(--text-light);
+    }
+
+    h1, h2 {
+      font-family: 'Playfair Display', serif;
+      color: var(--gold);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 3em;
+      margin: 40px 0 10px;
+    }
+
+    h2 {
+      font-size: 1.8em;
+      margin-top: 30px;
+    }
+
+    input, textarea {
+      width: 90%;
+      max-width: 500px;
+      padding: 14px;
+      margin: 10px 0;
+      border-radius: 10px;
+      border: 1px solid #444;
+      background-color: #2a2a2a;
+      color: var(--text-light);
+      font-size: 1em;
+    }
+
+    input[type="file"] {
+      border: none;
+    }
+
+    button {
+      background: linear-gradient(to right, #bfa76a, #d4af37);
+      color: #000;
+      font-weight: 600;
+      border: none;
+      padding: 10px 25px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 5px;
+      transition: transform 0.2s ease;
+    }
+
+    button:hover {
+      transform: scale(1.03);
+    }
+
+    #logoutButton {
+      display: none;
+      margin: 20px auto;
+    }
+
+    #allStoriesContainer {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .storyCard {
+      background: var(--card-bg);
+      border-left: 5px solid var(--gold);
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      text-align: left;
+    }
+
+    .storyMeta {
+      font-style: italic;
+      font-size: 0.9em;
+      color: #aaa;
+      margin-bottom: 10px;
+    }
+
+    .comments-section {
+      margin-top: 20px;
+      border-top: 1px solid #333;
+      padding-top: 10px;
+    }
+
+    hr {
+      border: 0;
+      border-top: 1px solid #333;
+      margin: 40px auto;
+      width: 80%;
+    }
+
+    img.avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      vertical-align: middle;
+      margin-right: 10px;
+      border: 2px solid var(--gold);
+    }
+
+    #profileSection {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid #333;
+      border-radius: 12px;
+      max-width: 600px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+
+    #profileAvatarImg {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--gold);
+      margin-bottom: 10px;
+    }
+
+    label {
+      display: block;
+      margin: 15px 0 5px;
+      font-weight: 500;
+    }
+
+    .comment-box textarea {
+      width: 100%;
+      background-color: #2d2d2d;
+    }
+
+    .comment-box button {
+      background: var(--gold);
+      color: #000;
+    }
+
+    .storyCard button {
+      margin-right: 10px;
+      margin-top: 10px;
+    }
+
+    #authSection, #storySection {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background: rgba(255,255,255,0.02);
+      border-radius: 12px;
+      border: 1px solid #333;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Daily Chai</h1>
+  <h2>It's All Stories</h2>
+
+  <div id="allStoriesContainer"></div>
+
+  <hr />
+
+  <button id="logoutButton" onclick="logoutUser()">Logout</button>
+
+  <div id="authSection">
+    <h2>Register</h2>
+    <form id="registerForm">
+      <input type="text" id="username" placeholder="Username" required><br>
+      <input type="password" id="password" placeholder="Password" required><br>
+      <input type="text" id="profileBio" placeholder="Enter your bio"><br>
+      <input type="file" id="profileAvatar"><br>
+      <button type="button" onclick="registerUser()">Register</button>
+    </form>
+
+    <h2>Login</h2>
+    <form id="loginForm">
+      <input type="text" id="loginUsername" placeholder="Username" required><br>
+      <input type="password" id="loginPassword" placeholder="Password" required><br>
+      <button type="button" onclick="loginUser()">Login</button>
+    </form>
+  </div>
+
+  <div id="storySection" style="display: none;">
+    <label><input type="checkbox" id="anonymousCheckbox"> Post anonymously</label><br>
+    <h2>Submit Your Story</h2>
+    <input type="text" id="coAuthorInput" placeholder="Co-author (optional)"><br>
+    <textarea id="storyInput" placeholder="Write your story here..." rows="4"></textarea><br>
+    <button onclick="addStory()">Submit Story</button>
+    <p id="loggedInUser"></p>
+  </div>
+
+  <div id="profileSection" style="display: none;">
+    <h2>My Profile</h2>
+    <img id="profileAvatarImg" src="" alt="Avatar"><br>
+    <p><strong>Username:</strong> <span id="profileUsername"></span></p>
+    <textarea id="updateBio" placeholder="Update your bio..." rows="3"></textarea><br>
+    <input type="file" id="updateAvatar"><br>
+    <button onclick="updateProfile()">Update Profile</button>
+  </div>
+
+  <script>
+    let currentUser = null;
+    let users = JSON.parse(localStorage.getItem('users')) || {};
+    let stories = JSON.parse(localStorage.getItem('stories')) || [];
+
+    function saveUsers() {
+      localStorage.setItem('users', JSON.stringify(users));
+    }
+
+    function saveStories() {
+      localStorage.setItem('stories', JSON.stringify(stories));
+    }
+
+    function registerUser() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const bio = document.getElementById('profileBio').value;
+      const avatar = document.getElementById('profileAvatar').files[0];
+
+      if (users[username]) {
+        alert('Username already taken.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function () {
+        users[username] = {
+          password,
+          bio,
+          avatar: reader.result
+        };
+        saveUsers();
+        alert('Registration successful. Please login.');
+      };
+
+      if (avatar) {
+        reader.readAsDataURL(avatar);
+      } else {
+        users[username] = { password, bio, avatar: null };
+        saveUsers();
+        alert('Registration successful. Please login.');
+      }
+    }
+
+    function loginUser() {
+      const username = document.getElementById('loginUsername').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      if (users[username] && users[username].password === password) {
+        currentUser = username;
+        document.getElementById('authSection').style.display = 'none';
+        document.getElementById('storySection').style.display = 'block';
+        document.getElementById('profileSection').style.display = 'block';
+        document.getElementById('logoutButton').style.display = 'block';
+        updateProfileUI();
+      } else {
+        alert('Invalid username or password.');
+      }
+    }
+
+    function logoutUser() {
+      currentUser = null;
+      document.getElementById('authSection').style.display = 'block';
+      document.getElementById('storySection').style.display = 'none';
+      document.getElementById('profileSection').style.display = 'none';
+      document.getElementById('logoutButton').style.display = 'none';
+    }
+
+    function addStory() {
+      const text = document.getElementById('storyInput').value.trim();
+      const anonymous = document.getElementById('anonymousCheckbox').checked;
+      const coAuthor = document.getElementById('coAuthorInput').value.trim();
+
+      if (!text) return;
+
+      const story = {
+        text,
+        author: anonymous ? 'Anonymous' : currentUser,
+        avatar: anonymous ? null : users[currentUser].avatar,
+        coAuthor: coAuthor || null,
+        comments: [],
+        likes: 0,
+        dislikes: 0,
+        likedBy: [],
+        dislikedBy: [],
+        timestamp: new Date().toISOString()
+      };
+
+      stories.unshift(story);
+      saveStories();
+      renderStories();
+      document.getElementById('storyInput').value = '';
+      document.getElementById('coAuthorInput').value = '';
+    }
+
+    function renderStories() {
+      const container = document.getElementById('allStoriesContainer');
+      container.innerHTML = '';
+
+      stories.forEach((story, index) => {
+        const card = document.createElement('div');
+        card.className = 'storyCard';
+
+        // Format timestamp nicely
+        const postDate = new Date(story.timestamp);
+        const dateStr = postDate.toLocaleDateString();
+        const timeStr = postDate.toLocaleTimeString();
+
+        const meta = `
+          <div>
+            ${story.avatar ? `<img class="avatar" src="${story.avatar}" alt="Avatar">` : ''}
+            <strong>${story.author}</strong>
+            ${story.coAuthor ? ` & <strong>${story.coAuthor}</strong>` : ''}
+          </div>
+          <div class="storyMeta">Posted on ${dateStr} at ${timeStr}</div>
+          <p>${story.text}</p>
+        `;
+
+        const likeDislikeButtons = `
+          <div>
+            <button onclick="likeStory(${index})" ${!currentUser ? 'disabled' : ''}>
+              👍 Like (${story.likes})
+            </button>
+            <button onclick="dislikeStory(${index})" ${!currentUser ? 'disabled' : ''}>
+              👎 Dislike (${story.dislikes})
+            </button>
+          </div>
+        `;
+
+        const commentList = story.comments.map(c => `<p><em>${c.user}</em>: ${c.text}</p>`).join('');
+        const commentBox = `
+          <div class="comment-box">
+            <textarea id="commentInput${index}" placeholder="Leave a comment..." rows="2"></textarea><br>
+            <button onclick="addComment(${index})" ${!currentUser ? 'disabled' : ''}>Comment</button>
+          </div>
+        `;
+
+        card.innerHTML = meta + likeDislikeButtons + commentList + commentBox;
+        container.appendChild(card);
+      });
+    }
+
+    function addComment(index) {
+      const textarea = document.getElementById(`commentInput${index}`);
+      const text = textarea.value.trim();
+      if (!text) return;
+      stories[index].comments.push({ user: currentUser || 'Guest', text });
+      saveStories();
+      renderStories();
+    }
+
+    function likeStory(index) {
+      const story = stories[index];
+      if (!currentUser) {
+        alert("Please login to like stories.");
+        return;
+      }
+
+      if (story.likedBy.includes(currentUser)) {
+        alert("You already liked this story.");
+        return;
+      }
+
+      // If user previously disliked, remove that dislike
+      if (story.dislikedBy.includes(currentUser)) {
+        story.dislikedBy = story.dislikedBy.filter(user => user !== currentUser);
+        story.dislikes--;
+      }
+
+      story.likedBy.push(currentUser);
+      story.likes++;
+      saveStories();
+      renderStories();
+    }
+
+    function dislikeStory(index) {
+      const story = stories[index];
+      if (!currentUser) {
+        alert("Please login to dislike stories.");
+        return;
+      }
+
+      if (story.dislikedBy.includes(currentUser)) {
+        alert("You already disliked this story.");
+        return;
+      }
+
+      // If user previously liked, remove that like
+      if (story.likedBy.includes(currentUser)) {
+        story.likedBy = story.likedBy.filter(user => user !== currentUser);
+        story.likes--;
+      }
+
+      story.dislikedBy.push(currentUser);
+      story.dislikes++;
+      saveStories();
+      renderStories();
+    }
+
+    function updateProfileUI() {
+      const user = users[currentUser];
+      document.getElementById('profileUsername').innerText = currentUser;
+      document.getElementById('profileAvatarImg').src = user.avatar || '';
+      document.getElementById('updateBio').value = user.bio || '';
+    }
+
+    function updateProfile() {
+      const bio = document.getElementById('updateBio').value;
+      const avatar = document.getElementById('updateAvatar').files[0];
+
+      users[currentUser].bio = bio;
+
+      if (avatar) {
+        const reader = new FileReader();
+        reader.onload = function () {
+          users[currentUser].avatar = reader.result;
+          updateProfileUI();
+          saveUsers();
+        };
+        reader.readAsDataURL(avatar);
+      } else {
+        saveUsers();
+        updateProfileUI();
+      }
+    }
+
+    window.onload = () => {
+      renderStories();
+    };
+  </script>
+</body>
+</html>
